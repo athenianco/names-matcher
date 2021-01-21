@@ -1,0 +1,118 @@
+name: Push
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+
+env:
+  PIP_CACHE: |
+    ~/.cache/pip
+    ~/.local/bin
+    ~/.local/lib/python3.*/site-packages
+
+jobs:
+  make-check:
+    name: make check
+    if: "!contains(github.event.head_commit.message, 'Bump version')"
+    runs-on: ubuntu-20.04
+    steps:
+    - name: actions/checkout
+      uses: actions/checkout@v2
+    - name: actions/cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ env.PIP_CACHE }}
+        key: ubuntu-20.04-pip-lint-${{ hashFiles('lint-requirements.txt') }}
+        restore-keys: ubuntu-20.04-pip-lint-
+    - name: pip lint-requirements.txt
+      run: |
+        set -x
+        pip3 install -r lint-requirements.txt --no-warn-script-location
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+    - name: make check
+      run: make check
+  test:
+    name: test
+    if: "!contains(github.event.head_commit.message, 'Bump version')"
+    runs-on: ubuntu-20.04
+    steps:
+    - name: actions/checkout
+      uses: actions/checkout@v2
+    - name: actions/cache pip
+      uses: actions/cache@v2
+      with:
+        path: ${{ env.PIP_CACHE }}
+        key: ubuntu-20.04-pip-main-${{ hashFiles('requirements.txt', 'test-requirements.txt') }}
+        restore-keys: ubuntu-20.04-pip-main-
+    - name: pip requirements.txt
+      run: |
+        set -x
+        pip3 install -r requirements.txt --no-warn-script-location
+        pip3 install -r test-requirements.txt --no-warn-script-location
+        pip3 install -e .
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+    - name: test
+      run: |
+        set -x
+        pytest -n 2 --log-level=info --benchmark-skip --cov-report=xml --cov=name_matcher
+    - uses: codecov/codecov-action@v1
+      name: codecov
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+  docker:
+    name: docker
+    if: "!contains(github.event.head_commit.message, 'Bump version')"
+    runs-on: ubuntu-20.04
+    steps:
+    - name: actions/checkout
+      uses: actions/checkout@v2
+    - uses: satackey/action-docker-layer-caching@v0.0.10
+      continue-on-error: true
+    - name: docker build
+      run: |
+        set -x
+        docker build -t names-matcher .
+    - name: docker prune
+      run: |
+        (docker image ls -a | grep -v names-matcher | tail -n +2 |  awk '{print $3}' | xargs docker rmi) || true
+        (docker image ls -a | grep -v latest | tail -n +2 |  awk '{print $3}' | xargs docker rmi) || true
+  bump_version:
+    name: Bump the version
+    needs: [make-check, test, docker]
+    if: "!contains(github.event.head_commit.message, 'Bump version') && github.ref == 'refs/heads/master'"
+    runs-on: ubuntu-20.04
+    steps:
+    - name: actions/checkout
+      uses: actions/checkout@v2
+      with:
+        persist-credentials: false
+    - name: current_version
+      run: echo "current_version=$(grep '__version__' names_matcher/metadata.py | cut -d\" -f2)" >> $GITHUB_ENV
+    - name: FragileTech/bump-version
+      uses: FragileTech/bump-version@main
+      with:
+        current_version: "${{ env.current_version }}"
+        files: names_matcher/metadata.py
+        commit_name: Groundskeeper Willie
+        commit_email: bot@athenian.co
+        login: gkwillie
+        token: "${{ secrets.GKWILLIE_TOKEN }}"
+  release-package:
+    if: "contains(github.event.head_commit.message, 'Bump version') && github.ref == 'refs/heads/master'"
+    name: Release package on PyPI
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          pip3 install -U setuptools twine wheel
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - name: Build package
+        run: make package
+      - name: Publish package to PyPI
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          user: __token__
+          password: "${{ secrets.PYPI_API_TOKEN }}"
