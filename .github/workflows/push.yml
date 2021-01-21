@@ -106,7 +106,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
-        run: pip3 install -U setuptools twine wheel
+        run: |
+          pip3 install -U setuptools twine wheel
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
       - name: Build package
         run: make package
       - name: Publish package to PyPI
