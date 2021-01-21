@@ -1,0 +1,9 @@
+[flake8]
+ignore=D100,D104,D301,W503,W504
+max-line-length=99
+inline-quotes="
+import-order-style=appnexus
+application-package-names=names_matcher
+per-file-ignores=
+    setup.py:D
+    names_matcher/tests/*:D
