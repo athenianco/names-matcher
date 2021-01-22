@@ -30,6 +30,20 @@ array([1, 0], dtype=int32)
 pip3 install names-matcher
 ```
 
+### Command line interface
+
+Given one identity per line in two files, print the matches to standard output:
+
+```
+python3 -m names_matcher path/to/file/1 path/to/file/2
+```
+
+Each identity is several names merged with `|`, for example:
+
+```
+Vadim Markovtsev|vmarkovtsev|vadim
+```
+
 ### Contributing
 
 Contributions are very welcome and desired! Please follow the [code of conduct](CODE_OF_CONDUCT.md) and read the [contribution guidelines](CONTRIBUTING.md).

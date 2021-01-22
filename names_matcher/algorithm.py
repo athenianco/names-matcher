@@ -74,7 +74,8 @@ class NamesMatcher:
 
         `names1` and `names2` do not have to be the same length.
         Each identity is one or several names.
-        :return: numpy array with mapping indexes, so that `names2[return] ~= names1`.
+        :return: numpy array with mapping indexes, so that `names2[return] ~= names1`. \
+                 If there is no match found, the index is negative.
         """
         parts1, parts2 = ([self.reap_identity(n) for n in names]
                           for names in (names1, names2))
