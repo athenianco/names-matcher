@@ -13,8 +13,8 @@ env:
     ~/.local/lib/python3.*/site-packages
 
 jobs:
-  make-check:
-    name: make check
+  check:
+    name: check
     if: "!contains(github.event.head_commit.message, 'Bump version')"
     runs-on: ubuntu-20.04
     steps:
@@ -40,6 +40,8 @@ jobs:
     steps:
     - name: actions/checkout
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 100
     - name: actions/cache pip
       uses: actions/cache@v2
       with:
@@ -56,7 +58,7 @@ jobs:
     - name: test
       run: |
         set -x
-        pytest -n 2 --log-level=info --benchmark-skip --cov-report=xml --cov=name_matcher
+        make test
     - uses: codecov/codecov-action@v1
       name: codecov
       with:
@@ -80,13 +82,14 @@ jobs:
         (docker image ls -a | grep -v latest | tail -n +2 |  awk '{print $3}' | xargs docker rmi) || true
   bump_version:
     name: Bump the version
-    needs: [make-check, test, docker]
+    needs: [check, test, docker]
     if: "!contains(github.event.head_commit.message, 'Bump version') && github.ref == 'refs/heads/master'"
     runs-on: ubuntu-20.04
     steps:
     - name: actions/checkout
       uses: actions/checkout@v2
       with:
+        fetch-depth: 100
         persist-credentials: false
     - name: current_version
       run: echo "current_version=$(grep '__version__' names_matcher/metadata.py | cut -d\" -f2)" >> $GITHUB_ENV
