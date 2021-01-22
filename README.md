@@ -4,3 +4,36 @@
 [![PyPI package](https://badgen.net/pypi/v/names-matcher)](https://pypi.org/project/names-matcher/)
 
 Fuzzy biject people's names between two lists.
+
+Let's define an identity as a series of names belonging to the same person. The algorithm is:
+
+1. Parse, normalize, and split names in each identity. The result is a set of strings for each identity.
+2. Define the similarity between identities as the Jaccard similarity between their sets of strings.
+3. Construct the distance matrix between identities in two specified lists.
+4. Solve the Linear Assignment Problem (LAP) on that matrix.
+
+We use metaphones in the normalization step to reduce the influence of different spelling and
+typos. We use lapjv to solve the LAP, so our solution scales to ~1000-s of identities.
+If you have a bigger problem size, you should use MinHashes (e.g. http://ekzhu.com/datasketch/)
+over the identity sets produced by `reap_identity()`. Feel free to PR them.
+
+Example:
+```
+>>> NamesMatcher()([["Vadim Markovtsev", "vmarkovtsev"], ["Long, Waren", "warenlg"]], \
+                    [["Warren"], ["VMarkovtsev"], ["Eiso Kant"]])
+array([1, 0], dtype=int32)
+```
+
+### Installation
+
+```
+pip3 install names-matcher
+```
+
+### Contributing
+
+Contributions are very welcome and desired! Please follow the [code of conduct](CODE_OF_CONDUCT.md) and read the [contribution guidelines](CONTRIBUTING.md).
+
+### License
+
+Apache-2.0, see [LICENSE](LICENSE).
