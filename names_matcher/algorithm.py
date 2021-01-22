@@ -1,5 +1,6 @@
 import re
-from typing import Iterable, Set, Union
+from typing import Iterable, Sequence, Set, Union
+import warnings
 
 from lapjv import lapjv
 from metaphone import doublemetaphone
@@ -77,9 +78,26 @@ class NamesMatcher:
         :return: numpy array with mapping indexes, so that `names2[return] ~= names1`. \
                  If there is no match found, the index is negative.
         """
-        parts1, parts2 = ([self.reap_identity(n) for n in names]
-                          for names in (names1, names2))
+        parts1, parts2 = ([self.reap_identity(n) for n in names] for names in (names1, names2))
+        return self.match_parts(parts1, parts2)
+
+    def match_parts(self,
+                    parts1: Sequence[Set[str]],
+                    parts2: Sequence[Set[str]],
+                    ) -> np.ndarray:
+        """
+        Match parsed, normalized, split identities. You shouldn't use this function unless you \
+        know what you are doing.
+
+        `parts1` and `parts2` do not have to be the same length.
+        Each identity is one or several parts.
+        :return: numpy array with mapping indexes, so that `parts2[return] ~= parts1`. \
+                 If there is no match found, the index is negative.
+        """
         distances = np.ones(((offset := len(parts1)) + len(parts2),) * 2)
+        if distances.shape[0] > 10000:
+            warnings.warn("Matching more than 10,000 names in sum is likely a heavy LAP and will "
+                          "take much time.", ResourceWarning)
         distance = self.distance
         for y, part1 in enumerate(parts1):
             for x, part2 in enumerate(parts2):

@@ -29,3 +29,8 @@ def test_reap_idenity(names, result):
 ])
 def test_distance(names1, names2, result):
     assert NamesMatcher.distance(names1, names2) == pytest.approx(result)
+
+
+def test_warning():
+    with pytest.warns(ResourceWarning):
+        NamesMatcher().match_parts(*([[{str(i)} for i in range(5001)]] * 2))

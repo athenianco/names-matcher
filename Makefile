@@ -17,4 +17,3 @@ package:
 	python setup.py --version
 	python setup.py bdist_wheel sdist --format=gztar
 	twine check dist/*
-
