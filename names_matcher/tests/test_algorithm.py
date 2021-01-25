@@ -6,7 +6,8 @@ from names_matcher.algorithm import NamesMatcher
 def test_docstring():
     assignments = NamesMatcher()([["Vadim Markovtsev", "vmarkovtsev"], ["Long, Waren", "warenlg"]],
                                  [["Warren"], ["VMarkovtsev"], "Eiso Kant"])
-    assert assignments.tolist() == [1, 0]
+    assert assignments[0].tolist() == [1, 0]
+    assert assignments[1].tolist() == [0.75, 0.5714285714285714]
 
 
 @pytest.mark.parametrize("names, result", [

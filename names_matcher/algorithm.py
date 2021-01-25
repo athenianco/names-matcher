@@ -1,5 +1,5 @@
 import re
-from typing import Iterable, Sequence, Set, Union
+from typing import Iterable, Sequence, Set, Tuple, Union
 import warnings
 
 from lapjv import lapjv
@@ -29,7 +29,7 @@ class NamesMatcher:
     Example:
     >>> NamesMatcher()([["Vadim Markovtsev", "vmarkovtsev"], ["Long, Waren", "warenlg"]], \
                         [["Warren"], ["VMarkovtsev"], ["Eiso Kant"]])
-    array([1, 0], dtype=int32)
+    (array([1, 0], dtype=int32), array([0.75      , 0.57142857]))
     """
 
     initials_re = re.compile(r"(?<=[a-z])(?=[A-Z])|([A-Z])(?=[A-Z]+[a-z])")
@@ -69,14 +69,15 @@ class NamesMatcher:
     def __call__(self,
                  names1: Iterable[Iterable[str]],
                  names2: Iterable[Iterable[str]],
-                 ) -> np.ndarray:
+                 ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Match people names from `names1` to `names2`.
 
         `names1` and `names2` do not have to be the same length.
         Each identity is one or several names.
         :return: numpy array with mapping indexes, so that `names2[return] ~= names1`. \
-                 If there is no match found, the index is negative.
+                 If there is no match found, the index is negative. \
+                 numpy array with mapping confidences from 0 to 1.
         """
         parts1, parts2 = ([self.reap_identity(n) for n in names] for names in (names1, names2))
         return self.match_parts(parts1, parts2)
@@ -84,7 +85,7 @@ class NamesMatcher:
     def match_parts(self,
                     parts1: Sequence[Set[str]],
                     parts2: Sequence[Set[str]],
-                    ) -> np.ndarray:
+                    ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Match parsed, normalized, split identities. You shouldn't use this function unless you \
         know what you are doing.
@@ -92,7 +93,8 @@ class NamesMatcher:
         `parts1` and `parts2` do not have to be the same length.
         Each identity is one or several parts.
         :return: numpy array with mapping indexes, so that `parts2[return] ~= parts1`. \
-                 If there is no match found, the index is negative.
+                 If there is no match found, the index is negative. \
+                 numpy array with mapping confidences from 0 to 1.
         """
         distances = np.ones(((offset := len(parts1)) + len(parts2),) * 2)
         if distances.shape[0] > 10000:
@@ -121,9 +123,11 @@ class NamesMatcher:
         """
         row_ind, _, _ = lapjv(distances)
         assignments = row_ind[:offset] - offset
+        confidences = 1 - distances[tuple(np.vstack([np.arange(offset), row_ind[:offset]]))]
         # there can be matches (1) -> (1) in case everything in (2) is at distance 1
+        confidences[assignments < 0] = 1
         assignments[assignments < 0] = -1
-        return assignments
+        return assignments, confidences
 
     @staticmethod
     def distance(parts1: Set[str], parts2: Set[str]) -> float:
