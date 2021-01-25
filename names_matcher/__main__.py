@@ -18,7 +18,7 @@ def main():
     for arg in (1, 2):
         with open(sys.argv[arg]) as fin:
             names[arg - 1] = [line.split("|") for line in fin]
-    for match in NamesMatcher()(*names):
+    for match in NamesMatcher()(*names)[0]:
         if match < 0:
             print()
         else:

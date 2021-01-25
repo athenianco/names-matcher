@@ -19,10 +19,14 @@ over the identity sets produced by `reap_identity()`. Feel free to PR them.
 
 Example:
 ```
+>>> from names_matcher import NamesMatcher
 >>> NamesMatcher()([["Vadim Markovtsev", "vmarkovtsev"], ["Long, Waren", "warenlg"]], \
                     [["Warren"], ["VMarkovtsev"], ["Eiso Kant"]])
-array([1, 0], dtype=int32)
+(array([1, 0], dtype=int32), array([0.75      , 0.57142857]))
 ```
+The first resulting tuple element is the mapping indexes: of same length as the first sequence,
+with indexes in the second sequence. The second element is the corresponding confidence values
+from 0 to 1.
 
 ### Installation
 
