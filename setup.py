@@ -24,7 +24,7 @@ setup(
     packages=find_packages(exclude=["tests"]),
     keywords=["fuzzy matching"],
     install_requires=["numpy>=1.0.0",
-                      "lapjv>=1.3.10,<2.0",
+                      "lapjv>=1.3.12,<2.0",
                       "metaphone>=0.6,<2.0",
                       "unidecode>=1.0.0,<2.0",
                       ],
