@@ -10,7 +10,7 @@ check:
 .PHONY: test
 test:
 	find -name "*.pyc" -delete
-	pytest --cov-report=xml --cov=names_matcher -s -o log_cli=true -o log_cli_level=info -n 2
+	pytest --cov-report=xml --cov=names_matcher -s -o log_cli=true -o log_cli_level=info
 
 .PHONY: package
 package:

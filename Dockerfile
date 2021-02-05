@@ -22,9 +22,17 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+ADD requirements.txt /project/requirements.txt
+RUN apt-get update && \
+    apt-get install -y --no-install-suggests --no-install-recommends python3-dev gcc && \
+    pip3 install -r /project/requirements.txt && \
+    apt-get purge -y python3-dev gcc && \
+    apt-get -y autoremove && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 ADD . /project
-RUN pip3 install -r /project/requirements.txt && \
-    pip3 install -e /project
+RUN pip3 install -e /project
 ARG COMMIT
 RUN echo "__commit__ = \"$COMMIT\"" >>/project/names_matcher/metadata.py && \
     echo "__date__ = \"$(date -u +'%Y-%m-%dT%H:%M:%SZ')\"" >>/project/names_matcher/metadata.py

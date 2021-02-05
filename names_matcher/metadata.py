@@ -1,3 +1,3 @@
 __package__ = "names-matcher"
-__version__ = "1.1.2"
-__description__ = "Fuzzy biject people's names between two lists."
+__version__ = "2.0.0"
+__description__ = "Fuzzily biject people's names between two lists."

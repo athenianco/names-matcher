@@ -18,6 +18,9 @@ def main():
     for arg in (1, 2):
         with open(sys.argv[arg]) as fin:
             names[arg - 1] = [line.split("|") for line in fin]
+    import logging
+    log = logging.getLogger()
+    log.info("read")
     for match in NamesMatcher()(*names)[0]:
         if match < 0:
             print()
