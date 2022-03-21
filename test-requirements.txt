@@ -1,4 +1,4 @@
-coverage==5.2.1
+coverage==6.3.2
 pytest==6.2.1
 pytest-benchmark==3.2.3
 pytest-xdist==2.2.0
