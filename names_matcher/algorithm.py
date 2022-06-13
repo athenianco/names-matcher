@@ -2,7 +2,6 @@ import re
 from typing import Iterable, Sequence, Set, Tuple, Union
 import warnings
 
-from fuzzywuzzy import fuzz
 from lapjv import lapjv
 import numpy as np
 try:
@@ -11,6 +10,7 @@ except ImportError:
     def tqdm(iterable):
         """No-op tqdm shim."""
         return iterable
+from thefuzz import fuzz
 from unidecode import unidecode
 
 
