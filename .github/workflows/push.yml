@@ -36,10 +36,19 @@ jobs:
   test:
     name: test
     if: "!contains(github.event.head_commit.message, 'Bump version')"
-    runs-on: ubuntu-20.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]
+        cibw_python: [ "cp38-*", "cp39-*", "cp310-*" ]
+        cibw_arch: [ "auto64" ]
+    defaults:
+      run:
+        shell: bash
     steps:
     - name: actions/checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 100
     - name: actions/cache pip
