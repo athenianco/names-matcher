@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:latest
 
 ENV BROWSER=/browser \
     LC_ALL=en_US.UTF-8 \
