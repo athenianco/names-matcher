@@ -25,9 +25,8 @@ setup(
     keywords=["fuzzy matching"],
     install_requires=["numpy>=1.20.0",
                       "lapjv>=1.3.14,<2.0",
-                      "thefuzz>=0.18.0,<2.0",
+                      "rapidfuzz>=2.0.0,<3.0",
                       "unidecode>=1.0.0,<2.0",
-                      "levenshtein>=0.12,<0.20",
                       ],
     tests_require=[],
     package_data={
