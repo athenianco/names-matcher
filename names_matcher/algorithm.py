@@ -10,7 +10,7 @@ except ImportError:
     def tqdm(iterable):
         """No-op tqdm shim."""
         return iterable
-from thefuzz import fuzz
+from rapidfuzz import fuzz
 from unidecode import unidecode
 
 
@@ -180,7 +180,7 @@ class NamesMatcher:
         combined_2to1 = combined_2to1.strip()
 
         # Pick the best our of 4: the normalized concatentation and the 3 set variants
-        pairwise = [fuzz.SequenceMatcher(None, *pair).ratio() for pair in (
+        pairwise = [fuzz.ratio(*pair) / 100 for pair in (
             (concat1, concat2),
             (sorted_sect, combined_1to2),
             (sorted_sect, combined_2to1),

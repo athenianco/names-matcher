@@ -9,7 +9,7 @@ Let's define an identity as a series of names belonging to the same person. The 
 
 1. Parse, normalize, and split names in each identity. The result is a set of strings per each.
 2. Define the similarity between identities as `max(ratio, token_set_ratio)`, where `ratio` \
-   and `token_set_ratio` are inspired by string comparison functions from FuzzyWuzzy.
+   and `token_set_ratio` are inspired by string comparison functions from [rapidfuzz](https://github.com/maxbachmann/RapidFuzz).
 3. Construct the distance matrix between identities in two specified lists.
 4. Solve the Linear Assignment Problem (LAP) on that matrix.
 
